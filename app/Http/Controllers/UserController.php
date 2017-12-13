@@ -9,11 +9,18 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
+        // return response()->json(['Workshop Lumens!']);
         return User::all();
     }
 
     public function store(Request $request, $id = '')
     {
+        $this->validate($request, [
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
+
         $data = [
             'name'     => $request->input('name'),
             'email'    => $request->input('email'),
