@@ -18,3 +18,4 @@ $router->get('/', function () use ($router)
 
 $router->get('users', 'UserController@index');
 $router->post('user/store/{id}', 'UserController@store');
+$router->delete('user/delete/{id}', 'UserController@delete');
