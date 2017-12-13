@@ -15,11 +15,23 @@ class UserController extends Controller
 
     public function store(Request $request, $id = '')
     {
-        $this->validate($request, [
-            'name'     => 'required',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-        ]);
+        $validation = [
+            'name' => 'required',
+        ];
+
+        if (empty($id) || $id == '')
+        {
+            $validation['email']    = 'required|email|unique:users,email';
+            $validation['password'] = 'required|min:6';
+        }
+        else
+        {
+            $validation['email']    = 'required|email|unique:users,email,' . $id;
+            $validation['password'] = 'min:6';
+        }
+
+        // validation
+        $this->validate($request, $validation);
 
         $data = [
             'name'     => $request->input('name'),
@@ -27,7 +39,23 @@ class UserController extends Controller
             'password' => Hash::make($request->input('password')),
         ];
 
-        $user = User::create($data);
+        if (empty($id) || $id == '')
+        {
+            $user = User::create($data);
+        }
+        else
+        {
+            $user        = User::firstOrCreate(['id' => $id]);
+            $user->name  = $data['name'];
+            $user->email = $data['email'];
+
+            if (!empty($data['password']))
+            {
+                $user->password = $data['password'];
+            }
+
+            $user->save();
+        }
 
         return $user;
     }
