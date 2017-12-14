@@ -29,6 +29,8 @@ $app->withFacades();
 
 $app->withEloquent();
 
+// $app->configure('filesystems');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -49,6 +51,15 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
+
+// $app->singleton('filesystem', function ($app)
+// {
+//     return $app->loadComponent(
+//         'filesystems',
+//         Illuminate\Filesystem\FilesystemSystemProvider::class,
+//         'filesystem'
+//     );
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +94,9 @@ $app->middleware([
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
+
+// $app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+$app->register(Appzcoder\LumenRoutesList\RoutesCommandServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

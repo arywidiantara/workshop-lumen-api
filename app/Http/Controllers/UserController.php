@@ -22,22 +22,13 @@ class UserController extends Controller
         return response()->json(['users' => $users]);
     }
 
-    public function store(Request $request, $id = '')
+    public function store(Request $request)
     {
         $validation = [
-            'name' => 'required',
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
         ];
-
-        if (empty($id) || $id == '')
-        {
-            $validation['email']    = 'required|email|unique:users,email';
-            $validation['password'] = 'required|min:6';
-        }
-        else
-        {
-            $validation['email']    = 'required|email|unique:users,email,' . $id;
-            $validation['password'] = 'min:6';
-        }
 
         // validation
         $this->validate($request, $validation);
@@ -48,23 +39,36 @@ class UserController extends Controller
             'password' => Hash::make($request->input('password')),
         ];
 
-        if (empty($id) || $id == '')
-        {
-            $user = User::create($data);
-        }
-        else
-        {
-            $user        = User::firstOrCreate(['id' => $id]);
-            $user->name  = $data['name'];
-            $user->email = $data['email'];
+        return User::create($data);
+    }
 
-            if (!empty($data['password']))
-            {
-                $user->password = $data['password'];
-            }
+    public function update(Request $request, $id = '')
+    {
+        $validation = [
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email,' . $id,
+            'password' => 'min:6',
+        ];
 
-            $user->save();
+        // validation
+        $this->validate($request, $validation);
+
+        $user = User::find($id);
+
+        if (empty($user))
+        {
+            return response()->json(['user not found']);
         }
+
+        $user->name  = $request->input('name');
+        $user->email = $request->input('email');
+
+        if (!empty($data['password']))
+        {
+            $user->password = Hash::make($request->input('password'));
+        }
+
+        $user->save();
 
         return $user;
     }
