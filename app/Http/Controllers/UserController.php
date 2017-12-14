@@ -16,9 +16,10 @@ class UserController extends Controller
             $users = $users->where('name', 'Like', '%' . $request->input('name') . '%');
         }
 
-        $users->paginate();
+        $users->simplePaginate(1);
+        $users = $users->get();
 
-        return $users;
+        return response()->json(['users' => $users]);
     }
 
     public function store(Request $request, $id = '')
