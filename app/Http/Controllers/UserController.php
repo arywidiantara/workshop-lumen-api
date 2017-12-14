@@ -9,8 +9,16 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        // return response()->json(['Workshop Lumens!']);
-        return User::all();
+        $users = User::OrderBy('name', 'desc');
+
+        if ($request->input('name'))
+        {
+            $users = $users->where('name', 'Like', '%' . $request->input('name') . '%');
+        }
+
+        $users->paginate();
+
+        return $users;
     }
 
     public function store(Request $request, $id = '')
