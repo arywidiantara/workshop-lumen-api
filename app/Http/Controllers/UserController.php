@@ -38,7 +38,6 @@ class UserController extends Controller
 
         $image_name = $request->input('image_name');
         $image      = $request->input('image_base64');
-        // $file       = $request->file('image_base64')->getRealPath();
 
         // get ekstension
         $image_name = explode(".", $image_name);
@@ -72,8 +71,8 @@ class UserController extends Controller
             'name'         => 'required',
             'email'        => 'required|email|unique:users,email,' . $id,
             'password'     => 'min:6',
-            'image_name'   => 'required_with:image_base64',
-            'image_base64' => 'base64',
+            'image_name'   => '',
+            'image_base64' => '',
         ];
 
         // validation
@@ -92,6 +91,29 @@ class UserController extends Controller
         if (!empty($data['password']))
         {
             $user->password = Hash::make($request->input('password'));
+        }
+
+        // check image
+        if (!empty($request->input('image_name')) && !empty($request->input('image_base64')))
+        {
+            $image_name = $request->input('image_name');
+            $image      = $request->input('image_base64');
+
+            // get ekstension
+            $image_name = explode(".", $image_name);
+            $extension  = end($image_name);
+
+            // decode base64
+            $image_decode = base64_decode($image);
+
+            // set name file
+            $filename       = str_random(25) . "." . $extension;
+            $directory_name = 'users/' . $filename;
+
+            // save image
+            Storage::put($directory_name, $image_decode, 'public');
+
+            $user->image = $filename;
         }
 
         $user->save();
