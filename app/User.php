@@ -4,6 +4,7 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 use Laravel\Lumen\Auth\Authorizable;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
@@ -27,4 +28,23 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+
+    protected $append = ['image_path'];
+
+    /**
+     * this function for get image URL
+     *
+     * @return object The image path attribute.
+     */
+    public function getImageAttribute()
+            {
+        if (empty($this->attributes['image']) || $this->attributes['image'] == null)
+                {
+            return URL::to('/images/photos.png');
+        }
+                else
+                {
+            return URL::to('medias/users/' . $this->attributes['image']);
+        }
+    }
 }

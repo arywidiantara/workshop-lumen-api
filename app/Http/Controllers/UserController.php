@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -25,29 +26,54 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validation = [
-            'name'     => 'required',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'name'         => 'required',
+            'email'        => 'required|email|unique:users,email',
+            'password'     => 'required|min:6',
+            'image_name'   => 'required',
+            'image_base64' => 'required',
         ];
 
         // validation
         $this->validate($request, $validation);
 
+        $image_name = $request->input('image_name');
+        $image      = $request->input('image_base64');
+        // $file       = $request->file('image_base64')->getRealPath();
+
+        // get ekstension
+        $image_name = explode(".", $image_name);
+        $extension  = end($image_name);
+
+        // decode base64
+        $image_decode = base64_decode($image);
+
+        // set name file
+        $filename       = str_random(25) . "." . $extension;
+        $directory_name = 'users/' . $filename;
+
+        // save image
+        Storage::put($directory_name, $image_decode, 'public');
+
         $data = [
             'name'     => $request->input('name'),
             'email'    => $request->input('email'),
             'password' => Hash::make($request->input('password')),
+            'image'    => $filename,
         ];
 
-        return User::create($data);
+        $user = User::create($data);
+
+        return $user;
     }
 
     public function update(Request $request, $id = '')
     {
         $validation = [
-            'name'     => 'required',
-            'email'    => 'required|email|unique:users,email,' . $id,
-            'password' => 'min:6',
+            'name'         => 'required',
+            'email'        => 'required|email|unique:users,email,' . $id,
+            'password'     => 'min:6',
+            'image_name'   => 'required_with:image_base64',
+            'image_base64' => 'base64',
         ];
 
         // validation
