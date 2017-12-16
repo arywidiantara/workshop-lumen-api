@@ -14,10 +14,13 @@ class UserController extends Controller
 
         if ($request->input('name'))
         {
-            $users = $users->where('name', 'Like', '%' . $request->input('name') . '%');
+            // you can use this
+            // $users = $users->where('name', 'Like', '%' . $request->input('name') . '%');
+            //or this
+            $users = $users->filterName($request->input('name'));
         }
 
-        $users->simplePaginate(1);
+        $users->simplePaginate(4);
         $users = $users->get();
 
         return response()->json(['users' => $users]);

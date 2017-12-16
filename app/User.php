@@ -16,18 +16,14 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'email', 'image',
-    ];
+    protected $fillable = ['name', 'email', 'image'];
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
-    protected $hidden = [
-        'password',
-    ];
+    protected $hidden = ['password'];
 
     protected $append = ['image_path'];
 
@@ -37,14 +33,19 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @return object The image path attribute.
      */
     public function getImageAttribute()
-            {
+    {
         if (empty($this->attributes['image']) || $this->attributes['image'] == null)
-                {
+        {
             return URL::to('/images/photos.png');
         }
-                else
-                {
+        else
+        {
             return URL::to('medias/users/' . $this->attributes['image']);
         }
+    }
+
+    public function scopeFilterName($query, $name = '')
+    {
+        return $query->where('name', 'like', '%' . $name . '%');
     }
 }
